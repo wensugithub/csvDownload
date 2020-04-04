@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Csv Download</title>
+	<style type="text/css">
+		tr td {
+			border: 1px solid black;
+			height: 30px;
+		}
+	</style>
+	<script src="lib/custom.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+    <div>
+    	<p><input type="button" value="download"></p>
+    </div>
+    <div style="padding-top: 30px">
+	    <table>
+	    	<thead>
+	    		<tr>
+	    			<td>id</td>
+	    			<td>name</td>
+	    			<td>age</td>
+	    		</tr>
+	    	</thead>
+	    	<tbody>
+	    		<tr>
+	    			<td>1</td>
+	    			<td>xiaoming</td>
+	    			<td>23</td>
+	    		</tr>
+	    		<tr>
+	    			<td>2</td>
+	    			<td>xiaowang</td>
+	    			<td>24</td>
+	    		</tr>
+	    		<tr>
+	    			<td>3</td>
+	    			<td>xiaoli</td>
+	    			<td>25</td>
+	    		</tr>
+	    	</tbody>
+	    </table>
+    </div>
+    <script type="text/javascript" charset="utf-8">
+    	// 声明的json对象
+    	var studentList = [
+ 			{
+ 				"id":"1",
+ 				"name":"xiaoming",
+ 				"age":"23"
+ 			},
+ 			{
+ 				"id":"2",
+ 				"name":"xiaowang",
+ 				"age":"24" 				
+ 			},
+ 			{
+ 				"id":"3",
+ 				"name":"xiaozhang",
+ 				"age":"25" 				
+ 			},
+    	];
+    	// 将json转换为csv格式
+    	var csv = jsonToCsv(studentList);
+    	var button = document.querySelector('input[type="button"]');
+        
+        // csv下载实现(chrome,fireFox)
+        function csvDownload(content, filename) {
+        	// 创建一个a元素
+        	var hrefLink = document.createElement('a');
+        	// 赋予download属性(html5新增属性)
+        	hrefLink.download = filename;
+        	hrefLink.style.display = 'none';
+
+            // 利用Blob将字符串转为二进制,参数必须为数组
+        	var blob = new Blob([csv]);
+        	// 将下载链接指向创建的blob url。
+        	// url例：blob:null/f046752e-238e-4bf7-ba13-647a2cae8e84
+        	hrefLink.href = URL.createObjectURL(blob);
+            // 这里的appendChild和removeChild是为了兼容FireFox而添加的
+        	document.body.appendChild(hrefLink);
+        	hrefLink.click();
+            document.body.removeChild(hrefLink);
+        }
+
+        // msSaveOrOpenBlob为IE独有的属性，支持下载
+    	if (navigator.msSaveOrOpenBlob) {
+    		  // IE调用msSaveorOpenBlob方法下载文件
+    		button.addEventListener('click', function() {
+              // 文件名
+              var fileName = "csv_download_";
+              var date = new Date();
+              var createDate = date.Format("yyyyMMddHHmmss");
+              fileName = fileName + createDate;
+    		  var blob = new Blob([csv]);
+    		  navigator.msSaveOrOpenBlob(blob, fileName);
+    		})
+    	} else {
+    		// Chrome及FireFox浏览器方法
+    		button.addEventListener('click', function() {
+              // 文件名
+              var fileName = "csv_download_";
+              var date = new Date();
+              var createDate = date.Format("yyyyMMddHHmmss");
+              fileName = fileName + createDate;
+    		  csvDownload(csv, fileName);
+    		})
+    	}
+    </script>
+</body>
+</html>
