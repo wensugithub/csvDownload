@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Csv Download</title>
+	<style type="text/css">
+		tr td {
+			border: 1px solid black;
+			height: 30px;
+		}
+	</style>
+	<script src="lib/custom.js" type="text/javascript" charset="utf-8"></script>
+	<script src="lib/jquery-1.9.1.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript" charset="utf-8">
+		function getJson() {
+          var defer = $.Deferred();
+          $.ajax({
+          	url: 'https://jsondata.okiba.me/v1/json/4tfNI200405045344',
+          	//type: 'default GET (Other values: POST)',
+          	cache:false,
+          	complete: function(jqXHR, textStatus) {
+
+          	},
+          	dataType: 'json'
+          })
+          .done(function(responsdData) {
+          	defer.resolve(responsdData);
+          	console.log("success");
+          })
+          .fail(function() {
+          	console.log("error");
+          })
+          .always(function() {
+          	console.log("complete");
+          });
+          
+          return defer.promise();
+		}
+
+	    $(document).ready(function() {
+	        var csv = "";
+	        var studentList = "";
+            $.when(getJson())
+             .done(function(json) {
+                 studentList = json;
+                 csv = jsonToCsv(studentList);
+                 var html = "";
+                 // 生成table
+                 html = json.map(function(oneRow) {
+                 	return "<tr>" + Object.keys(oneRow).map(function(columnName) {
+                         return "<td>" + oneRow[columnName] + "</td>";
+                 	}).join("") + "</tr>";
+                 }).join("");
+                 $(document).find('tbody').append(html);
+                 $('input[type=button]').prop("disabled",false);
+             });
+            
+	    	// 将json转换为csv格式
+	    	
+	    	var button = document.querySelector('input[type="button"]');
+	        
+	        // csv下载实现(chrome,fireFox)
+	        function csvDownload(content, filename) {
+	        	// 创建一个a元素
+	        	var hrefLink = document.createElement('a');
+	        	// 赋予download属性(html5新增属性)
+	        	hrefLink.download = filename;
+	        	hrefLink.style.display = 'none';
+
+	            // 利用Blob将字符串转为二进制,参数必须为数组
+	        	var blob = new Blob([csv]);
+	        	// 将下载链接指向创建的blob url。
+	        	// url例：blob:null/f046752e-238e-4bf7-ba13-647a2cae8e84
+	        	hrefLink.href = URL.createObjectURL(blob);
+	            // 这里的appendChild和removeChild是为了兼容FireFox而添加的
+	        	document.body.appendChild(hrefLink);
+	        	hrefLink.click();
+	            document.body.removeChild(hrefLink);
+	        }
+
+	        // msSaveOrOpenBlob为IE独有的属性，支持下载
+	    	if (navigator.msSaveOrOpenBlob) {
+	    		  // IE调用msSaveorOpenBlob方法下载文件
+	    		button.addEventListener('click', function() {
+	              // 文件名
+	              var fileName = "csv_download_";
+	              var date = new Date();
+	              var createDate = date.Format("yyyyMMddHHmmss");
+	              fileName = fileName + createDate;
+	    		  var blob = new Blob([csv]);
+	    		  navigator.msSaveOrOpenBlob(blob, fileName);
+	    		})
+	    	} else {
+	    		// Chrome及FireFox浏览器方法
+	    		button.addEventListener('click', function() {
+	              // 文件名
+	              var fileName = "csv_download_";
+	              var date = new Date();
+	              var createDate = date.Format("yyyyMMddHHmmss");
+	              fileName = fileName + createDate;
+	    		  csvDownload(csv, fileName);
+	    		})
+	    	}
+		});
+    	
+    </script>
+</head>
+<body>
+    <div>
+    	<p><input type="button" value="download" disabled="disabled"></p>
+    </div>
+    <div style="padding-top: 30px">
+	    <table>
+	    	<thead>
+	    		<tr>
+	    			<td>id</td>
+	    			<td>name</td>
+	    			<td>age</td>
+	    		</tr>
+	    	</thead>
+	    	<tbody>
+	    	</tbody>
+	    </table>
+    </div>
+</body>
+</html>
