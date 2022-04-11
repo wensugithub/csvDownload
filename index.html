@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8">
+	<!--<meta charset="utf-8">-->
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title>Csv Download</title>
 	<style type="text/css">
@@ -16,23 +16,27 @@
 		function getJson() {
           var defer = $.Deferred();
           $.ajax({
-          	url: 'https://jsondata.okiba.me/v1/json/4tfNI200405045344',
+          	// url: 'https://jsondata.okiba.me/v1/json/y0bvU200603115646',
+          	url: 'http://localhost:9001',
           	//type: 'default GET (Other values: POST)',
           	cache:false,
           	complete: function(jqXHR, textStatus) {
 
           	},
-          	dataType: 'json'
+          	//dataType: 'json'
+            // beforeSend : function(xhr) {
+            //   xhr.overrideMimeType("text/plain; charset=UTF-8");
+            // },
           })
           .done(function(responsdData) {
-          	defer.resolve(responsdData);
-          	console.log("success");
+          	  defer.resolve(responsdData);
+          	  console.log("success");
           })
-          .fail(function() {
-          	console.log("error");
+          .fail(function(jqXHR, textStatus, errorThrown) {
+          	  console.log("error");
           })
           .always(function() {
-          	console.log("complete");
+          	  console.log("complete");
           });
           
           return defer.promise();
@@ -69,7 +73,7 @@
 	        	hrefLink.style.display = 'none';
 
 	            // 利用Blob将字符串转为二进制,参数必须为数组
-	        	var blob = new Blob([csv]);
+	        	var blob = new Blob([content], {type:'text/plain,charset=shift_jis'});
 	        	// 将下载链接指向创建的blob url。
 	        	// url例：blob:null/f046752e-238e-4bf7-ba13-647a2cae8e84
 	        	hrefLink.href = URL.createObjectURL(blob);
@@ -94,11 +98,11 @@
 	    	} else {
 	    		// Chrome及FireFox浏览器方法
 	    		button.addEventListener('click', function() {
-	              // 文件名
-	              var fileName = "csv_download_";
-	              var date = new Date();
-	              var createDate = date.Format("yyyyMMddHHmmss");
-	              fileName = fileName + createDate;
+						// 文件名
+						var fileName = "csv_download_";
+						var date = new Date();
+						var createDate = date.Format("yyyyMMddHHmmss");
+						fileName = fileName + createDate;
 	    		  csvDownload(csv, fileName);
 	    		})
 	    	}
